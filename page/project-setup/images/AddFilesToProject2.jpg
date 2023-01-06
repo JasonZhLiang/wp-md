@@ -1,0 +1,361 @@
+
+
+
+
+<html class="login_page">
+    <head>
+
+        <title>Login Page</title>
+
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <!--  see:
+                 http://stackoverflow.com/questions/1341089/using-meta-tags-to-turn-off-caching-in-all-browsers
+                 http://www.i18nguy.com/markup/metatags.html
+        -->
+        <meta http-equiv="Cache-Control" content="no-cache" />
+        <meta http-equiv="Pragma" content="no-cache" />
+        <meta http-equiv="Expires" content="0" />
+
+        <!-- to correct the unsightly Flash of Unstyled Content. http://www.bluerobot.com/web/css/fouc.asp -->
+        <script type="text/javascript"></script>
+
+	<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+	<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+	<meta name="msapplication-TileColor" content="#ffc40d">
+	<meta name="theme-color" content="#ffffff">
+
+        <link href="styles/braincloudadmin.css" rel="stylesheet" type="text/css" />
+
+        <!--  BOOTSTRAP -->
+
+        <link href="vendor/bootstrap/css/bootstrap.css" rel="stylesheet" type="text/css" />
+
+        <!--  /BOOTSTRAP -->
+
+        <link href="styles/font-awesome.min.css" rel="stylesheet" type="text/css" />
+
+        <link href="styles/login-signup.css" rel="stylesheet" type="text/css" />
+
+        <link href="styles/lineup_helpers.css" rel="stylesheet" type="text/css" />
+
+        <style>
+            .errorblock {
+                color: #ff0000;
+                background-color: #ffEEEE;
+                border: 3px solid #ff0000;
+                padding: 8px;
+                margin: 16px;
+            }
+            .wrapper {
+                background : none;
+            }
+            #status-box {
+            }
+            #status-box:hover{
+                border-bottom: 1px solid white!important;
+            }
+            .no-decorartion:hover{
+                text-decoration: none!important;
+            }
+            #status-icon {
+                bottom: 21px;
+                left: -12px;
+            }
+            .text-success {
+                color: #2fcc66;
+            }
+            .text-warning {
+                color: #f1c40f;
+            }
+            .text-danger {
+                color: #e74c3c;
+            }
+            .status-link:hover {
+                text-decoration: none!important;
+                opacity: 0.85;
+            }
+
+            #signup-btn {
+                /*position: absolute;
+                z-index: 10;
+                margin-top: 50px;
+                float: right;*/
+            }
+
+
+            .hidden {
+                display:none
+            }
+
+            .message-banner {
+                height: 80px!important;
+                width: 800px;
+                text-align: left;
+                padding-lef: 50px;
+                margin-bottom: 15px;
+                margin-top: 0px;
+                background-color: #fff!important;
+                border: 1px solid #d2d2d2;
+            }
+
+            .message-banner-icon {
+            }
+
+            .message-visible-text {
+                padding-top: 10px;
+                font-size: 15px;
+                color: #9d9a9a;
+                font-weight: 500;
+                width: 700px;
+            }
+
+            .message-visible-text {
+                width: 650px;
+            }
+
+            #banner-container  {
+                min-height: 80px!important;
+                margin-right: 0px;
+                margin-left: -150px;
+                width: 600px;
+            }
+
+            html {
+                display: none !important;
+            }
+        </style>
+
+        <script>
+			// Pending activation - if no loggedIn cookie exists, we assume this a first time visitor so can redirect just once to sign up page
+			if (navigator.cookieEnabled) {
+				var value = "; " + document.cookie;
+				var parts = value.split("; newArrival=");
+				if (parts.length !== 2) {
+					/// document.location = "signup";
+				}
+
+				// If we received a deep-link but spring kicked us out to the login page due to authentication,
+				// a document frag will be left behind. We cache this frag in a short-expiry cookie
+				// in order for the select_company.js page to redirect us properly once the
+				// user has been logged in.
+				var ndx = document.location.toString().lastIndexOf("#");
+				if (ndx !== -1) {
+					var fragment = document.location.toString().substring(ndx);
+					var expiryDate = new Date((new Date()).getTime() + 1000 * 60 * 5); // 5 mins expiry
+					document.cookie = "docfrag=" + fragment + ";expires=" + expiryDate.toUTCString() + ";path=/";
+				} else {
+					document.cookie = "docfrag=;expires=Thu, 01 Jan 1970 i00:00:01 GMT;";
+				}
+			}
+
+        </script>
+	<!-- This code snippet causes an error when we try to extract the translations from login.jsp -->
+<!-- So keep it in a partial since we don't extract translations from partial files -->
+<script>
+	var jspInitState = {
+		lastException: ""
+	};
+</script>
+
+    <iframe src="../integrations/cmf/Script_ChildPage_StagingScript.html" width="0" height="0"   frameBorder="0"></iframe>
+
+</head>
+
+<body  class="portal-exterior-body" style="overflow-x: hidden;">
+    <div portalconfig></div>
+    <div ng-controller="loginCtrl">
+        <div id="topbar">
+            <div class="row">
+                <div class="col-md-12">
+
+                    <img
+                        id="login-brand-logo"
+                        ng-src="{{ portalConfig.loginLogoUrl }}"
+                        onerror="if (this.src != '../images/signup/LOGO_Login_OnBlue.png') this.src = '../images/signup/LOGO_Login_OnBlue.png';"
+                        style="width: 250px; height: 80px;">
+
+                    <div class="pull-right" ng-show="selfRegistrationEnabled" hiddenwhenbranded>
+
+                        <span class="title" id="header-right-text" style="margin-right: 10px;margin-top: 5px;" translate>New User?</span>
+
+                        <a id ="signup-btn"  href="{{ 'signup' | externallink }}" class="btn btn-info pull-right"  style="margin-right: 10px;" translate>SIGN UP</a>
+
+                        <span class="title  pull-right" id="" style="margin-right: 10px;margin-top: 5px;" translate>OR</span>
+
+                        <a id="learn-more-btn header-right"
+                           href="http://www.getbraincloud.com" style="margin-right: 10px;padding: 7px;"
+                           target="_blank" class="btn btn-yellow pull-right"  >
+                            <b translate>LEARN MORE</b>
+                        </a>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div portalconfig></div>
+
+        <div id="login-container">
+            <div class="inner">
+                <div id="banner-box" class="row">
+                    <globalmessage />
+                </div>
+
+                <div class="center-block text text-center">
+                    <h3 id="title-text" class="text-left text-yellow" translate>WELCOME BACK</h3>
+
+                    
+                </div>
+
+                <div id="login-panel" class="form-group panel mt-15">
+                    <form id="email-login" ng-show="showEmailPasswordLogin()" ng-submit="login()" name='f'>
+                        <div class="center-block">
+                            
+                                
+                                
+                                    <input type="text"
+                                        value="" ng-attr-placeholder="{{getLocalizedString('Email address')}}" name="j_username" id="j_username" ng-model="userCredentials.username" ng-disabled="waitingOnAuth"  class="form-control" />
+                                
+                            
+                        </div>
+
+                        <div class="center-block mt-15">
+                            <input type="password" value="" ng-disabled="waitingOnAuth" ng-attr-placeholder="{{getLocalizedString('Password')}}" name='j_password' id="j_password" ng-model="userCredentials.password" class="form-control" />
+                        </div>
+
+                        <div class="center-block text text-center mt-15">
+                            <button id="signin-btn" class="btn btn-info" ng-disabled="waitingOnAuth" style="width: 280px; font-size: 20px;" translate>LOG IN</button>
+                        </div>
+
+                        <div id="forgotpass-link-box">
+                            <div class="center-block text text-center">
+                                <a href="{{ 'forgot-password' | externallink }}" id="forgot-password-text" class="link-item" translate>Forgot Password?</a>
+                            </div>
+                        </div>
+                    </form>
+
+                    <div ng-show="!showEmailPasswordLogin() && showSSOLogin()" id="sso-lock-icon" class="center-block text-center">
+                        <img src="../images/signup/BC-SSO-LockIcon.png" />
+                    </div>
+
+                    <div ng-show="showSSOLogin()" id="sso-login" style="display: flex; flex-direction: column;">
+                        <hr style="margin-left: -15px; margin-right: -15px;" />
+                        <button class="btn btn-info" style="width: 280px; font-size: 20px; margin-top: 15px;" ng-repeat="ssoLink in portalLoginConfig.ssoLinks" ng-click='ssoLogin(ssoLink.url);'>{{ ssoLink.label }}</button>
+                    </div>
+                </div>
+            </div>
+        </div> 
+    
+    <div id="versionNum" class="system-version" hiddenwhenbranded>
+        <span class="platform-version">R4.13.1-7706</span>
+        <br>
+        <a ng-show="statusPageEnabled == 'true'" ng-href="{{statusPageUrl}}" target="_blank" class="status-link no-decorartion">
+            <span  ng-show="showStatusIoState" id="status-icon">
+                <img id="status-icon-img" ng-src="{{statusPageStatus.iconSrc}}" style="margin-bottom: 2px;" alt="bullet, red icon" width="16" height="16">
+            </span>
+            <span id="status-box" class="platform-version ml-5">{{statusPageStatus.message | translate}}</span>
+        </a>
+    </div>
+</div>
+
+<script type="text/ng-template" id="myModalContent.html">
+    <div class="modal-content">
+    <div class="modal-header clearfix">
+    <i class="fa fa-remove  pull-right white" ng-click="$ctrl.cancel()" data-dismiss="modal"></i>
+    <h4 translate style="margin-bottom: auto">Unsupported Browser</h4>
+    </div>
+    <div class="modal-body">
+    <p>The Portal supports <b>Google Chrome</b>, <b>Firefox</b> and <b>Safari</b>. Please switch to a supported browser to continue.</p>
+    </div>
+    <div class="modal-footer">
+    <button class="btn" data-dismiss="modal" ng-click="$ctrl.cancel()">
+    <i class="fa fa-remove"></i>
+    <span translate>Cancel</span>
+    </button>
+    </div>
+    </div>
+</script>
+
+    <!-- JS dependencies -->
+	<script src="../dist/vendor.js" type="text/javascript"></script>
+	<script src="../dist/vendor-external.js" type="text/javascript"></script>
+	
+
+	<script src="../vendor/jquery-ui/jquery-ui.min.js" type="text/javascript"></script>
+	<script src="../lib/jquery.form.js" type="text/javascript"></script>
+	<script src="../lib/underscore.js" type="text/javascript"></script>
+	<script src="../lib/dotty.js" type="text/javascript"></script>
+	<script src="../js/clone.js" type="text/javascript"></script>
+	<script src="../lib/giftbox.js" type="text/javascript"></script>
+
+	<script src="../vendor/angular-deferred-bootstrap/angular-deferred-bootstrap.js" type="text/javascript"></script>
+	<script src="../bower_components/angular-bootstrap/ui-bootstrap.min.js" type="text/javascript"></script>
+	<script src="../bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js" type="text/javascript"></script>
+	<script src="../vendor/angular-sanitize/angular-sanitize.min.js" type="text/javascript"></script>
+	<script src="../vendor/device-detector/ng-device-detector.min.js" type="text/javascript"></script>
+
+	<script src="../pages/login/js/app.js" type="text/javascript"></script>
+	<script src="../js/common/services.js" type="text/javascript"></script>
+	<script src="../js/state/portalConfig/portalConfigController.js" type="text/javascript"></script>
+	<script src="../directives/globalMessage/globalMessage.js" type="text/javascript"></script>
+	<script src="../pages/serveradmin/js/serveradmin-portal-config.js" type="text/javascript"></script>
+	<script src="../pages/externalpage/externaldirectives.js" type="text/javascript"></script>
+	<script src="../js/translations.js" type="text/javascript"></script>
+	<script src="../pages/login/js/authenticationSrvc.js" type="text/javascript"></script>
+	<script src="../pages/login/js/browserClientIdSrvc.js" type="text/javascript"></script>
+	<script src="../pages/login/js/browserVendorValidationSrvc.js" type="text/javascript"></script>
+
+
+
+
+
+
+
+
+<script type="text/javascript" src="https://cdn.statuspage.io/se-v2.js"></script>
+
+
+    <script>
+        window.intercomSettings = {app_id: 'ede963a7c7b854938c1196bb83dc3a0924951055'};
+    </script>
+    <script>
+      function renderIntercom () {
+          (function () {
+			var w = window;
+			var ic = w.Intercom;
+			if (typeof ic === "function") {
+				ic('reattach_activator');
+				ic('update', intercomSettings);
+			} else {
+				var d = document;
+				var i = function () {
+					i.c(arguments)
+				};
+				i.q = [];
+				i.c = function (args) {
+					i.q.push(args)
+				};
+				w.Intercom = i;
+				function l() {
+					var s = d.createElement('script');
+					s.type = 'text/javascript';
+					s.async = true;
+					s.src = 'https://widget.intercom.io/widget/ede963a7c7b854938c1196bb83dc3a0924951055';
+					var x = d.getElementsByTagName('script')[0];
+					x.parentNode.insertBefore(s, x);
+				}
+				if (w.attachEvent) {
+					w.attachEvent('onload', l);
+				} else {
+					w.addEventListener('load', l, false);
+				}
+			}
+		})();
+      }
+    </script>
+
+
+</body>
+</html>
